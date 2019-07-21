@@ -28,15 +28,13 @@ jobs:
 stages:
   # runs on master commits and PRs
   - name: check
-    if: NOT tag =~ ^v
 
   # runs on master commits and PRs
   - name: test
-    if: NOT tag =~ ^v
 
   # runs on main repo version-tagged commits
   - name: publish
-    if: repo = johnclara/jsonnet-case-class AND tag =~ ^v
+    if: ((branch = master AND type = push) OR (tag IS present)) AND NOT fork
 
 cache:
   directories:
