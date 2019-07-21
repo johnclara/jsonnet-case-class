@@ -1,6 +1,6 @@
 inThisBuild(
   List(
-    organization := "com.johnclara",
+    organization := "com.github.johnclara",
     licenses += "Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.html"),
     startYear := Some(2019),
     scalaVersion := "2.12.8",
