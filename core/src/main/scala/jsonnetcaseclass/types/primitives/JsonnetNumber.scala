@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-package com.johnclara.jsonnetcaseclass
+package jsonnetcaseclass.types.primitives
 
-object HelloWorld extends App {
-  println("Hello World")
-}
+import jsonnetcaseclass.types.JsonnetType
+
+case object JsonnetNumber extends JsonnetType
