@@ -16,8 +16,13 @@ val jsonnetCaseClass = project
   )
 
 lazy val core = project
-.in(file("core"))
-.settings(
-  name := "jsonnet-case-class",
-  parallelExecution in Test := false
-)
+  .in(file("core"))
+  .settings(
+    name := "jsonnet-case-class",
+    parallelExecution in Test := false
+  ).settings(
+    libraryDependencies ++= Seq(
+      "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+      "org.scalatest"  %% "scalatest"    % "3.0.8" % Test,
+    )
+  )
