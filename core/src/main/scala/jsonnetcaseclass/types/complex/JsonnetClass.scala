@@ -16,13 +16,22 @@
 
 package jsonnetcaseclass.types.complex
 
+import jsonnetcaseclass.io.{Format, LongTypeHint, ShortTypeHint}
 import jsonnetcaseclass.scalavro.util.ReflectionHelpers
 import jsonnetcaseclass.types.JsonnetType
 
 import scala.reflect.runtime.universe._
 
-case class JsonnetClass(name: String, fields: Seq[JsonnetClass.Field[_]]) extends JsonnetType {
-  def print: String =
+case class JsonnetClass(name: String, fullName: String, fields: Seq[JsonnetClass.Field[_]]) extends JsonnetType {
+  def printTypeHint(padding: String)(implicit format: Format): String = format.typeHint.fold("") {
+        case LongTypeHint(key) =>
+          s"\n|$padding$key : $fullName,"
+        case ShortTypeHint(key) =>
+          s"\n|$padding$key : $name,"
+      }
+
+  def padding(shift: Int)(implicit format: Format) = " " * format.shiftWidth * shift
+  def print(implicit format: Format): String =
     s"""
       |/*** CODE GENED - DO NOT EDIT ***/
       |
@@ -31,14 +40,15 @@ case class JsonnetClass(name: String, fields: Seq[JsonnetClass.Field[_]]) extend
       | * @return {$name}
       | */
       |local $name(${fields.map(_.printParam).mkString(", ")}) =
-      |    {
-      |${fields.map(_.printVar(" " * 8)).mkString("\n|")}
-      |${fields.map(_.printGetter(" " * 8)).mkString("\n|")}
-      |    };
+      |${padding(1)}{
+      |${fields.map(_.printVar(padding(2))).mkString("\n|")}
+      |${printTypeHint(padding(2))}
+      |${fields.map(_.printGetter(padding(2))).mkString("\n|")}
+      |${padding(1)}};
       |{
-      |  $name:: $name,
-      |}
-    """.stripMargin
+      |${padding(1)}$name :: $name,
+      |}""".stripMargin
+
 }
 
 object JsonnetClass {
@@ -53,6 +63,7 @@ object JsonnetClass {
 
           new JsonnetClass(
             name = symbol.name.toString,
+            fullName = tt.tpe.toString,
             fields = ReflectionHelpers.caseClassParamsOf[T].toSeq map {
               case (name, tag) => JsonnetClass.Field(name, defaultValues(name))(tag.asInstanceOf[TypeTag[Any]])
             }
